@@ -1,6 +1,63 @@
 import streamlit as st
 from datetime import date
 
+# ---------- PASSWORD PROTECTION ----------
+PASSWORD = "290403"  # CHANGE THIS TO YOUR DESIRED PASSWORD
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown(
+        """
+        <style>
+        body {
+            background: linear-gradient(135deg, #fff8f8 0%, #fdf3f3 50%, #faf5f7 100%);
+            font-family: 'Lora', serif;
+        }
+        .password-container {
+            max-width: 400px;
+            margin: 150px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 10px 35px rgba(168, 93, 110, 0.15);
+            text-align: center;
+            border: 1px solid rgba(212, 165, 176, 0.3);
+        }
+        .password-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: #a85d6e;
+            margin-bottom: 20px;
+        }
+        .password-subtitle {
+            font-size: 18px;
+            color: #7a6a72;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="password-container">', unsafe_allow_html=True)
+    st.markdown('<h1 class="password-title">❤️</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="password-subtitle">This page is just for you, my love.<br>Enter the password to continue.</p>', unsafe_allow_html=True)
+
+    password_input = st.text_input("Password", type="password", label_visibility="collapsed")
+
+    if st.button("Enter"):
+        if password_input == PASSWORD:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("Incorrect password. Try again, a chaba ❤️")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()  # Stop execution until authenticated
+
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
     page_title="One Year With You ya NOUR ELHOUDA",
@@ -337,12 +394,12 @@ sweet_things = [
     "Your kindness.",
     "How you believe in me, sometimes more than I believe in myself.",
     "Your honesty. It makes everything feel safe.",
-    "The way you feel like home, even from far away."
+    "The way you feel like home, even from far away.",
     "Your laugh—it lights up my day.",
     "Your creativity.",
     "How you make even ordinary moments special.",
     "Your gorgeous smile.",
-    "Your eyes"
+    "Your eyes",
     "The way you look at me.",
     "YOU"
 ]
@@ -391,6 +448,7 @@ for i, m in enumerate(memories):
         """,
         unsafe_allow_html=True
     )
+
 st.markdown('<h2 class="section-title">Our Video Memories</h2>', unsafe_allow_html=True)
 
 st.markdown(
@@ -413,6 +471,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 # ---------- FUTURE SECTION ----------
 st.markdown('<h2 class="section-title">What Comes Next</h2>', unsafe_allow_html=True)
 
