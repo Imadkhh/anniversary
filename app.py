@@ -399,8 +399,7 @@ sweet_things = [
     "Your creativity.",
     "How you make even ordinary moments special.",
     "Your gorgeous smile.",
-    "Your eyes",
-    "The way you look at me.",
+    "Your eyes.",
     "YOU"
 ]
 
@@ -412,7 +411,7 @@ st.markdown('<h2 class="section-title">Our Memories</h2>', unsafe_allow_html=Tru
 
 memories = [
     {"date": "The First Message", "pov": "That first text is the best thing i have ever done ", "image": "media/images/memory1.jpg"},
-    {"date": "Our First Meeting", "pov": "Seeing you for the first time felt surreal. Everything I imagined suddenly became real, and in that moment, the distance felt smaller.", "image": "media/images/memory2.jpg"},
+    {"date": "Our First Meeting", "pov": "Seeing you for the first time felt surreal. Everything I imagined suddenly became real.", "image": "media/images/memory2.jpg"},
     {"date": "My Hoodie on You", "pov": "This picture still makes me smile. Seeing you in my hoodie made me feel close to you in a quiet, comforting way.", "image": "media/images/memory3.jpg"},
     {"date": "When I Said I Loved You", "pov": "I remember exactly how heavy and real those words felt. Saying them was scary, but it felt honest. And im really grateful", "image": "media/images/memory3_1_love_text.jpg"},
     {"date": "Our First Real Date", "pov": "That sushi date meant more than just going out. I was nervous because meeting you felt important — like something I didn't want to mess up.", "image": "media/images/memory4.jpg"},
@@ -454,7 +453,7 @@ st.markdown('<h2 class="section-title">Our Video Memories</h2>', unsafe_allow_ht
 st.markdown(
     """
     <div class="memory-card" style="padding: 40px;">
-        <div class="memory-title" style="margin-bottom: 25px;">A Moment Captured in Time</div>
+        <div class="memory-title" style="margin-bottom: 25px;">Every moment with you is beautiful</div>
         <div class="memory-text" style="margin-bottom: 30px;">Every second with you is worth remembering.</div>
     """,
     unsafe_allow_html=True
@@ -480,7 +479,7 @@ st.markdown(
     <div class="future-card">
     <div class="text-content">
     No matter what happens in life, my goal is to spend forever with you, and I will keep trying for you every single day.<br><br>
-    One year has passed, and I look forward to many more tears, smiles, and unforgettable moments together, <em>Inchallah a chaba</em>.<br><br>
+    One year has passed, and I look forward to many more tears, smiles, and unforgettable moments together<br><br>
     One day, this page will feel like the beginning of a much bigger story.<br><br>
     And I can't wait to write it with you.
     </div>
