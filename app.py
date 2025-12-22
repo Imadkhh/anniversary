@@ -470,7 +470,7 @@ with st.expander("Set the mood ", expanded=False):
             st.info("Add a file at `media/audio/soft_music.mp3` to enable music.")
 
             # Hidden “for later” note
-with st.expander("Open this only when you feel sad 🤍", expanded=False):
+with st.expander("Open this only when you feel sad", expanded=False):
     st.write(
         "I just want to say that im very proud of you noor , for everything you have accomplished and for the bad days you have survived , I know that you dont see it "
         "but you are so strong (and beautiful)."
@@ -537,7 +537,7 @@ def build_pdf_bytes(text: str) -> bytes:
 pdf_bytes = build_pdf_bytes(LETTER_TEXT)
 
 st.download_button(
-    label="Download this letter as PDF 💌",
+    label="Download this letter as PDF",
     data=pdf_bytes,
     file_name="One_Year_With_You_Letter.pdf",
     mime="application/pdf"
@@ -722,7 +722,7 @@ for idx, thing in enumerate(sweet_things, start=1):
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Button for one more reason
-if st.button("Tap for one more reason 💫"):
+if st.button("Tap for one more reason"):
     st.session_state.extra_reason_shown = True
 
 if st.session_state.extra_reason_shown:
@@ -745,10 +745,6 @@ st.markdown(
             You are everything I could ever wish for and more.
         </div>
         <div class="heart-row">
-            <span>❤️</span>
-            <span>💕</span>
-            <span>💗</span>
-            <span>💕</span>
             <span>❤️</span>
         </div>
     </div>
@@ -833,7 +829,7 @@ miss_messages = [
     "You are safe in my heart."
 ]
 
-if st.button("Press here when you miss me 🤍"):
+if st.button("Press here when you miss me"):
     st.markdown(
         f"""
         <div class='sweet-card' style='margin-top:26px;'>
@@ -875,3 +871,4 @@ st.markdown(
 )
 
 st.markdown('</div>', unsafe_allow_html=True)  # Close main-container
+
