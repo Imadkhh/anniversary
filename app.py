@@ -450,7 +450,7 @@ st.markdown(
 )
 st.markdown(
     f'<div style="text-align:center;"><span class="date-pill">'
-    f'From Imad • I Love You Nour Elhouda • {date.today().strftime("%B %d, %Y")}'
+    f'From Imad to Nour Elhouda • {date.today().strftime("%B %d, %Y")}'
     '</span></div>',
     unsafe_allow_html=True
 )
@@ -871,4 +871,5 @@ st.markdown(
 )
 
 st.markdown('</div>', unsafe_allow_html=True)  # Close main-container
+
 
