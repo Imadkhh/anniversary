@@ -1,7 +1,9 @@
 import streamlit as st
-from datetime import date
+from datetime import date, datetime, timedelta
 import random
-from fpdf import FPDF   # fpdf2
+from fpdf import FPDF
+from PIL import Image
+import time
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
@@ -120,6 +122,66 @@ if not st.session_state.authenticated:
     )
     st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
+
+    # Restore scroll position after refresh
+st.markdown(
+    """
+    <script>
+    // Restore scroll position after page loads
+    window.onload = function() {
+        const savedPosition = localStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition));
+            localStorage.removeItem('scrollPosition');
+        }
+    }
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
+# ---------- CALCULATE TIME TOGETHER AND KNOWN EACH OTHER ----------
+def calculate_time_together():
+    """Calculate time since December 20, 2024 12:21 AM"""
+    start_date_together = datetime(2024, 12, 20, 0, 21, 0)
+    now = datetime.now()
+    delta = now - start_date_together
+    
+    days = delta.days
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    return days, hours, minutes
+
+def calculate_time_known():
+    """Calculate time since May 5, 2023"""
+    start_date_known = datetime(2023, 5, 5, 22, 2, 0)
+    now = datetime.now()
+    delta = now - start_date_known
+    
+    days = delta.days
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    return days, hours, minutes
+
+def calculate_next_anniversary():
+    """Calculate days until next anniversary (Dec 20)"""
+    now = datetime.now()
+    current_year = now.year
+    
+    # If current date is past Dec 20, next anniversary is next year
+    if now.month > 12 or (now.month == 12 and now.day >= 20):
+        next_anniversary = datetime(current_year + 1, 12, 20, 0, 0, 0)
+    else:
+        next_anniversary = datetime(current_year, 12, 20, 0, 0, 0)
+    
+    delta = next_anniversary - now
+    days = delta.days
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    return days, hours, minutes
 
 # ---------- CUSTOM CSS WITH ROMANTIC AESTHETIC ----------
 st.markdown(
@@ -384,6 +446,98 @@ st.markdown(
         scroll-behavior: smooth;
     }
 
+    /* TIMER STYLES */
+    .timer-container {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(253, 248, 250, 0.97));
+        border-radius: 24px;
+        padding: 32px;
+        margin: 40px 0;
+        text-align: center;
+        box-shadow: 0 12px 40px rgba(168, 93, 110, 0.12);
+        border: 1px solid rgba(212, 165, 176, 0.3);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .timer-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 32px;
+        color: #a85d6e;
+        margin-bottom: 10px;
+    }
+
+    .timer-subtitle {
+        font-size: 16px;
+        color: #7a6a72;
+        font-style: italic;
+        margin-bottom: 26px;
+    }
+
+    .timer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .timer-box {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 18px;
+        padding: 20px 15px;
+        border: 1px solid rgba(212, 165, 176, 0.25);
+        box-shadow: 0 6px 20px rgba(168, 93, 110, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .timer-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(168, 93, 110, 0.15);
+    }
+
+    .timer-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: #a85d6e;
+        margin-bottom: 5px;
+        text-shadow: 1px 1px 2px rgba(168, 93, 110, 0.1);
+    }
+
+    .timer-label {
+        font-size: 14px;
+        color: #85646f;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .timer-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #d4a5b0;
+        font-weight: 300;
+        margin: 0 10px;
+    }
+
+    .anniversary-box {
+        background: linear-gradient(135deg, #f8d7e3, #f3c6d4);
+        color: white;
+        border-radius: 18px;
+        padding: 25px 20px;
+        margin: 30px 0 10px 0;
+        border: none;
+        box-shadow: 0 8px 30px rgba(168, 93, 110, 0.2);
+    }
+
+    .anniversary-box .timer-value {
+        color: white;
+        text-shadow: 1px 1px 3px rgba(168, 93, 110, 0.3);
+    }
+
+    .anniversary-box .timer-label {
+        color: rgba(255, 255, 255, 0.95);
+    }
+
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -456,7 +610,6 @@ st.markdown(
 )
 
 
-
 # ---------- SMALL CONTROL BAR (MUSIC TOGGLE) ----------
 with st.expander("Set the mood ", expanded=False):
     st.write("Turn this on if you want some soft background music while reading.")
@@ -469,12 +622,78 @@ with st.expander("Set the mood ", expanded=False):
         except FileNotFoundError:
             st.info("Add a file at `media/audio/soft_music.mp3` to enable music.")
 
-            # Hidden “for later” note
+    # Hidden "for later" note
 with st.expander("Open this only when you feel sad", expanded=False):
     st.write(
-        "I just want to say that im very proud of you noor , for everything you have accomplished and for the bad days you have survived , I know that you dont see it "
+        "I just want to say that I'm very proud of you Nour, for everything you have accomplished and for the bad days you have survived. I know that you don't see it "
         "but you are so strong (and beautiful)."
     )
+
+    # ---------- COUNTDOWN TIMERS ----------
+st.markdown('<h2 class="section-title">Our Time Together</h2>', unsafe_allow_html=True)
+
+# Create placeholders for live updating
+time_together_placeholder = st.empty()
+time_known_placeholder = st.empty()
+next_anniversary_placeholder = st.empty()
+
+# Calculate times
+days_together, hours_together, minutes_together= calculate_time_together()
+days_known, hours_known, minutes_known= calculate_time_known()
+days_to_anniversary, hours_to_anniversary, minutes_to_anniversary = calculate_next_anniversary()
+
+with time_together_placeholder.container():
+    st.markdown(
+        f"""
+        <div class="timer-container">
+            <div class="timer-title">Together Since December 20, 2024, 12:21 AM</div>
+            <div class="timer-subtitle">Every second with you has been a blessing</div>
+            <div class="timer-grid">
+                <div class="timer-box">
+                    <div class="timer-value">{days_together}</div>
+                    <div class="timer-label">Days</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-value">{hours_together}</div>
+                    <div class="timer-label">Hours</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-value">{minutes_together}</div>
+                    <div class="timer-label">Minutes</div>
+                </div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with time_known_placeholder.container():
+    st.markdown(
+        f"""
+        <div class="timer-container">
+            <div class="timer-title">Known Each Other Since May 5, 2023, 10:02 PM</div>
+            <div class="timer-subtitle">From strangers to soulmates</div>
+            <div class="timer-grid">
+                <div class="timer-box">
+                    <div class="timer-value">{days_known}</div>
+                    <div class="timer-label">Days</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-value">{hours_known}</div>
+                    <div class="timer-label">Hours</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-value">{minutes_known}</div>
+                    <div class="timer-label">Minutes</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 
 # ---------- LETTER SECTION ----------
 st.markdown('<h2 class="section-title">A Letter for You</h2>', unsafe_allow_html=True)
@@ -484,15 +703,15 @@ st.markdown(
     <div class="letter-card">
         <div class="letter-header">My Nour Elhouda,</div>
         <div class="text-content">
-        20th December is a day I will always hold close to my heart,the day we became <em>us</em>. 
+        20th December is a day I will always hold close to my heart, the day we became <em>us</em>. 
         I am so proud of that decision, and every single moment with you since then has been PERFECT. 
         You make me the happiest man alive, and I am endlessly grateful for you.<br><br>
-        I promise to be by your side through all of life’s good days and bad days. Yes, we may sometimes argue, 
+        I promise to be by your side through all of life's good days and bad days. Yes, we may sometimes argue, 
         but every disagreement is worth it, because you are the only girl I want, the only one I need. 
         I also want to apologize for the times you went to sleep upset because of me. Please know it was never 
-        my intention to cause you the slightest discomfort,your happiness is one of my greatest goals in life.<br><br>
-        You are breathtaking, Nour Elhouda,truly stunning. Everything about you is perfect: your laugh, your face, 
-        your eyes, your hair… I could go on forever, and still it wouldn’t capture all your beauty. 
+        my intention to cause you the slightest discomfort, your happiness is one of my greatest goals in life.<br><br>
+        You are breathtaking, Nour Elhouda, truly stunning. Everything about you is perfect: your laugh, your face, 
+        your eyes, your hair… I could go on forever, and still it wouldn't capture all your beauty. 
         But what touches me even more is your heart. You are the kindest, purest, and most innocent soul I have ever known.<br><br>
         I am so grateful to have you in my life a 3ayniya, and I look forward to countless more memories together. 
         You are my love, my joy, and my everything.
@@ -509,9 +728,9 @@ LETTER_TEXT = """My Nour Elhouda
 20th December is a day I will always hold close to my heart the day we became us.
 I am so proud of that decision, and every single moment with you since then has been perfect.
 You make me the happiest man alive, and I am endlessly grateful for you.
-I promise to be by your side through all of life’s good days and bad days. Yes, we may sometimes argue, but every disagreement is worth it, because you are the only girl I want, the only one I need.
-I also want to apologize for the times you went to sleep upset because of me. Please know it was never my intention to cause you the slightest discomfortyour happiness is one of my greatest goals in life.
-You are breathtaking, Nour Elhouda, truly stunning. Everything about you is perfect: your laugh, your face, your eyes, your hair… I could go on forever, and still it wouldn’t capture all your beauty.
+I promise to be by your side through all of life's good days and bad days. Yes, we may sometimes argue, but every disagreement is worth it, because you are the only girl I want, the only one I need.
+I also want to apologize for the times you went to sleep upset because of me. Please know it was never my intention to cause you the slightest discomfort your happiness is one of my greatest goals in life.
+You are breathtaking, Nour Elhouda, truly stunning. Everything about you is perfect: your laugh, your face, your eyes, your hair… I could go on forever, and still it wouldn't capture all your beauty.
 But what touches me even more is your heart. You are the kindest, purest, and most innocent soul I have ever known.
 I am so grateful to have you in my life, a 3ayniya, and I look forward to countless more memories together.
 You are my love, my joy, and my everything.
@@ -525,14 +744,14 @@ def build_pdf_bytes(text: str) -> bytes:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    pdf.add_font("DejaVu", "", "fonts/DejaVuSans.ttf")  # uni=True deprecated
-    pdf.set_font("DejaVu", size=12)
+    try:
+        pdf.add_font("DejaVu", "", "fonts/DejaVuSans.ttf")
+        pdf.set_font("DejaVu", size=12)
+    except:
+        pdf.set_font("Arial", size=12)
 
     pdf.multi_cell(0, 8, text)
-
-    # Convert bytearray -> bytes
     return bytes(pdf.output(dest="S"))
-
 
 pdf_bytes = build_pdf_bytes(LETTER_TEXT)
 
@@ -542,7 +761,6 @@ st.download_button(
     file_name="One_Year_With_You_Letter.pdf",
     mime="application/pdf"
 )
-
 
 # ---------- SWEET THINGS SECTION ----------
 st.markdown('<h2 class="section-title">Things I Love About You</h2>', unsafe_allow_html=True)
@@ -567,7 +785,6 @@ if "extra_reason_shown" not in st.session_state:
 
 extra_reason = "Not a reason, I just love you so much."
 
-# Card styling for reasons (already present in your code)
 st.markdown(
     """
     <style>
@@ -753,6 +970,7 @@ st.markdown(
 )
 
 # ---------- MEMORIES SECTION ----------
+# ---------- MEMORIES SECTION ----------
 st.markdown('<h2 class="section-title">Our Memories</h2>', unsafe_allow_html=True)
 
 memories = [
@@ -793,7 +1011,6 @@ for i, m in enumerate(memories):
         """,
         unsafe_allow_html=True
     )
-
 # ---------- VIDEO MEMORIES ----------
 st.markdown('<h2 class="section-title">Our Video Memories</h2>', unsafe_allow_html=True)
 
@@ -872,4 +1089,23 @@ st.markdown(
 
 st.markdown('</div>', unsafe_allow_html=True)  # Close main-container
 
-
+# ---------- REAL-TIME AUTO-REFRESH ----------
+# This will refresh the page every 1 second to update the timers
+refresh_time = 1  # Changed from 10 to 1 second
+if time.time() - st.session_state.get('last_refresh', 0) > refresh_time:
+    st.session_state.last_refresh = time.time()
+    # Use JavaScript to refresh the page
+    st.markdown(
+        f"""
+        <script>
+        // Store scroll position before refresh
+        const scrollPosition = window.scrollY || window.pageYOffset;
+        localStorage.setItem('scrollPosition', scrollPosition);
+        
+        setTimeout(function() {{
+            window.location.reload(1);
+        }}, {refresh_time * 1000});
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
