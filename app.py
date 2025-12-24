@@ -4,6 +4,7 @@ import random
 from fpdf import FPDF
 from PIL import Image
 import time
+import base64
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
@@ -12,6 +13,84 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# ---------- LOADING SCREEN ----------
+if "loading_done" not in st.session_state:
+    st.session_state.loading_done = False
+
+if not st.session_state.loading_done:
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:wght@400;500&display=swap');
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #fff4f8 0%, #ffe3ef 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeOut 1.3s ease forwards;
+            animation-delay: 4.7s;
+        }
+
+        .heart {
+            font-size: 110px;
+            animation: heartbeat 2.2s infinite;
+            margin-bottom: 25px;
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            color: #a85d6e;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-family: 'Lora', serif;
+            font-size: 20px;
+            color: #7a6a72;
+            font-style: italic;
+            margin-bottom: 45px;
+        }
+
+   
+
+     
+
+        @keyframes fillBar {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        @keyframes heartbeat {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.22); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        #MainMenu, footer, header { visibility: hidden; }
+        </style>
+
+        <div class="loading-overlay">
+            <div class="heart"></div>
+            <div class="title">Welcome to the Normad Experience</div>
+            <div class="subtitle">One Year With You</div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    time.sleep(5)
+    st.session_state.loading_done = True
+    st.rerun()
+
 
 # ---------- PASSWORD PROTECTION ----------
 PASSWORD = "290403"  # CHANGE THIS TO YOUR DESIRED PASSWORD
@@ -182,6 +261,20 @@ def calculate_next_anniversary():
     minutes, seconds = divmod(remainder, 60)
     
     return days, hours, minutes
+
+def build_pdf_bytes(text: str) -> bytes:
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+
+    try:
+        pdf.add_font("DejaVu", "", "fonts/DejaVuSans.ttf")
+        pdf.set_font("DejaVu", size=12)
+    except:
+        pdf.set_font("Arial", size=12)
+
+    pdf.multi_cell(0, 8, text)
+    return bytes(pdf.output(dest="S"))
 
 # ---------- CUSTOM CSS WITH ROMANTIC AESTHETIC ----------
 st.markdown(
@@ -579,6 +672,7 @@ st.markdown(
 )
 
 # ---------- HEADER ----------
+# ---------- HEADER ----------
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # Floating hearts decoration
@@ -592,8 +686,44 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Title & subtitle
-st.markdown('<h1 class="title">One Year With You</h1>', unsafe_allow_html=True)
+# --- SECRET LETTER LOGIC ---
+SECRET_LETTER_TEXT = """Eyniya,
+
+I hid this note here because I wanted to surprise you with one more reminder of how much you mean to me.
+
+I just want to tell you, in case I haven't said it enough: You are absolutely amazing. I don't think you always see it, but you shine so brightly (ya noorrr). Being with you gives me a feeling I never knew existed, like I am exactly where I am meant to be, calm and incredibly happy.
+
+You are, without a doubt, the best thing that has ever happened to me. My life changed the moment you walked into it, and every day since then has been better simply because you are here.
+
+I want you to know something important: no matter what life puts in our way, no matter how hard things get, I will always be by your side. In your good days and your hardest ones, you will never face anything alone. You are my family, my safe place, and my home. I will be choosing you every single day, especially when things are not easy.
+
+Even our arguments and the problems we face don’t scare me. I see them as hard conversations meant to strengthen our relationship, to help us understand each other better, and to grow together rather than apart. I never want to fight against you, only for us.
+
+To me, you are perfect. Your kindness, your laugh, your heart, everything about you is exactly what I want.
+
+.
+
+Yours,  
+Imad (Or Midou kima t7ebi)
+"""
+
+
+# Generate the Secret PDF
+secret_pdf_bytes = build_pdf_bytes(SECRET_LETTER_TEXT)
+# Encode to Base64 to embed in HTML
+b64_pdf = base64.b64encode(secret_pdf_bytes).decode('utf-8')
+
+# Create the invisible link that looks like the title
+secret_title_html = f'''
+<a href="data:application/pdf;base64,{b64_pdf}" download="Secret_Letter_For_Nour.pdf" class="title" style="text-decoration:none; display:block; cursor:pointer; color: black !important;">
+    One Year With You
+</a>
+'''
+
+# Render the clickable title
+st.markdown(secret_title_html, unsafe_allow_html=True)
+
+# Subtitle (unchanged)
 st.markdown(
     '<div class="subtitle">20th December – the day we became <em>us</em>.</div>',
     unsafe_allow_html=True
@@ -739,19 +869,7 @@ Forever yours
 IMAD
 """
 
-def build_pdf_bytes(text: str) -> bytes:
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
 
-    try:
-        pdf.add_font("DejaVu", "", "fonts/DejaVuSans.ttf")
-        pdf.set_font("DejaVu", size=12)
-    except:
-        pdf.set_font("Arial", size=12)
-
-    pdf.multi_cell(0, 8, text)
-    return bytes(pdf.output(dest="S"))
 
 pdf_bytes = build_pdf_bytes(LETTER_TEXT)
 
